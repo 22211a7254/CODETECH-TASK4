@@ -1,0 +1,65 @@
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Step 1: Generate and preprocess the dataset
+# Create a synthetic dataset
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_classes=2, random_state=42)
+df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(X.shape[1])])
+df['target'] = y
+
+# Display the first few rows of the dataset
+print(df.head())
+
+# Step 2: Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Step 3: Apply various classification algorithms
+# Logistic Regression
+log_reg = LogisticRegression()
+log_reg.fit(X_train, y_train)
+y_pred_log_reg = log_reg.predict(X_test)
+
+# Decision Tree
+dt = DecisionTreeClassifier()
+dt.fit(X_train, y_train)
+y_pred_dt = dt.predict(X_test)
+
+# Random Forest
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+y_pred_rf = rf.predict(X_test)
+
+# Support Vector Machine
+svc = SVC()
+svc.fit(X_train, y_train)
+y_pred_svc = svc.predict(X_test)
+
+# Step 4: Evaluate and compare the models
+# Function to calculate and display metrics
+def evaluate_model(y_true, y_pred, model_name):
+    print(f"\n{model_name} Performance:")
+    print(f"Accuracy: {accuracy_score(y_true, y_pred):.2f}")
+    print(f"Precision: {precision_score(y_true, y_pred):.2f}")
+    print(f"Recall: {recall_score(y_true, y_pred):.2f}")
+    print(f"F1 Score: {f1_score(y_true, y_pred):.2f}")
+    print("Confusion Matrix:")
+    cm = confusion_matrix(y_true, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Class 0', 'Class 1'], yticklabels=['Class 0', 'Class 1'])
+    plt.title(f'Confusion Matrix - {model_name}')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.show()
+
+evaluate_model(y_test, y_pred_log_reg, 'Logistic Regression')
+evaluate_model(y_test, y_pred_dt, 'Decision Tree')
+evaluate_model(y_test, y_pred_rf, 'Random Forest')
+evaluate_model(y_test, y_pred_svc, 'Support Vector Machine')
